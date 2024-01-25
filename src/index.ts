@@ -6,6 +6,11 @@ import { greetUser } from '$utils/greet';
 const apiUrl = 'https://pokeapi.co/api/v2/pokemon';
 const numberOfPokemons = 99; // Change this to the number of Pokémon you want to fetch
 
+// Utility function to convert text to sentence case
+function toSentenceCase(text: string) {
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+}
+
 // Fetch data from the API
 async function fetchPokemonData(id: number) {
   const response = await fetch(`${apiUrl}/${id}`);
@@ -32,7 +37,7 @@ window.Webflow.push(async () => {
     // Use the fetched data to create the item
     const item = cloneNode(itemTemplate);
     const imageElement = item.querySelector<HTMLImageElement>('[data-element="pokemon-image"]');
-    const idElement = item.querySelector<HTMLDivElement>('[data-element="pokemon-id"]');
+    const typesElement = item.querySelector<HTMLDivElement>('[data-element="pokemon-types"]');
     const nameElement = item.querySelector<HTMLDivElement>('[data-element="pokemon-name"]');
 
     if (imageElement) {
@@ -40,12 +45,15 @@ window.Webflow.push(async () => {
       imageElement.src = pokemonDetails.sprites.front_default;
     }
 
-    if (idElement) {
-      idElement.textContent = pokemonDetails.id.toString();
+    if (typesElement) {
+      // Display Pokémon types in sentence case
+      const types = pokemonDetails.types.map((type: any) => toSentenceCase(type.type.name));
+      typesElement.textContent = types.join(', ');
     }
 
     if (nameElement) {
-      nameElement.textContent = pokemonDetails.name.toString();
+      // Display Pokémon name in sentence case
+      nameElement.textContent = toSentenceCase(pokemonDetails.name);
     }
 
     item.removeAttribute('data-cloack');
