@@ -1,1 +1,47 @@
-"use strict";(()=>{var r=(e,o=!0)=>e.cloneNode(o);var f=[{id:1,name:"Ditto",sprites:{other:{official_artwork:{front_default:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/132.png"}}}},{id:2,name:"Pikachu",sprites:{other:{official_artwork:{front_default:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png"}}}},{id:3,name:"Bulbasaur",sprites:{other:{official_artwork:{front_default:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png"}}}}];window.Webflow=window.Webflow||[];window.Webflow.push(()=>{let e=document.querySelector('[data-element="pokemon-item"]');if(!e)return;let o=e.parentElement;e.remove();let m=f.map(({id:s,name:l,sprites:p})=>{let t=r(e),n=t.querySelector('[data-element="pokemon-image"]'),i=t.querySelector('[data-element="pokemon-id"]'),a=t.querySelector('[data-element="pokemon-name"]');return n&&(n.src=p.other.official_artwork.front_default),i&&(i.textContent=s.toString()),a&&(a.textContent=l.toString()),t.removeAttribute("data-cloack"),t});console.log(m),o.append(...m)});})();
+"use strict";
+(() => {
+  // bin/live-reload.js
+  new EventSource(`${"http://localhost:3000"}/esbuild`).addEventListener("change", () => location.reload());
+
+  // node_modules/.pnpm/@finsweet+ts-utils@0.40.0/node_modules/@finsweet/ts-utils/dist/helpers/cloneNode.js
+  var cloneNode = (node, deep = true) => node.cloneNode(deep);
+
+  // src/index.ts
+  var apiUrl = "https://pokeapi.co/api/v2/pokemon";
+  var numberOfPokemons = 99;
+  async function fetchPokemonData(id) {
+    const response = await fetch(`${apiUrl}/${id}`);
+    const data = await response.json();
+    return data;
+  }
+  window.Webflow = window.Webflow || [];
+  window.Webflow.push(async () => {
+    const itemTemplate = document.querySelector('[data-element="pokemon-item"]');
+    if (!itemTemplate)
+      return;
+    const itemList = itemTemplate.parentElement;
+    itemTemplate.remove();
+    const pokemonItems = [];
+    for (let id = 1; id <= numberOfPokemons; id++) {
+      const pokemonDetails = await fetchPokemonData(id);
+      const item = cloneNode(itemTemplate);
+      const imageElement = item.querySelector('[data-element="pokemon-image"]');
+      const idElement = item.querySelector('[data-element="pokemon-id"]');
+      const nameElement = item.querySelector('[data-element="pokemon-name"]');
+      if (imageElement) {
+        imageElement.src = pokemonDetails.sprites.front_default;
+      }
+      if (idElement) {
+        idElement.textContent = pokemonDetails.id.toString();
+      }
+      if (nameElement) {
+        nameElement.textContent = pokemonDetails.name.toString();
+      }
+      item.removeAttribute("data-cloack");
+      pokemonItems.push(item);
+    }
+    console.log(pokemonItems);
+    itemList.append(...pokemonItems);
+  });
+})();
+//# sourceMappingURL=index.js.map

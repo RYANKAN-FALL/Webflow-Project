@@ -3,47 +3,18 @@ import { cloneNode } from '@finsweet/ts-utils';
 
 import { greetUser } from '$utils/greet';
 
-const pokemonsData = [
-  {
-    id: 1,
-    name: 'Ditto',
-    sprites: {
-      other: {
-        official_artwork: {
-          front_default:
-            'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/132.png',
-        },
-      },
-    },
-  },
-  {
-    id: 2,
-    name: 'Pikachu',
-    sprites: {
-      other: {
-        official_artwork: {
-          front_default:
-            'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png',
-        },
-      },
-    },
-  },
-  {
-    id: 3,
-    name: 'Bulbasaur',
-    sprites: {
-      other: {
-        official_artwork: {
-          front_default:
-            'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png',
-        },
-      },
-    },
-  },
-];
+const apiUrl = 'https://pokeapi.co/api/v2/pokemon';
+const numberOfPokemons = 99; // Change this to the number of Pokémon you want to fetch
+
+// Fetch data from the API
+async function fetchPokemonData(id: number) {
+  const response = await fetch(`${apiUrl}/${id}`);
+  const data = await response.json();
+  return data;
+}
 
 window.Webflow = window.Webflow || [];
-window.Webflow.push(() => {
+window.Webflow.push(async () => {
   const itemTemplate = document.querySelector<HTMLAnchorElement>('[data-element="pokemon-item"]');
   if (!itemTemplate) return;
 
@@ -51,28 +22,36 @@ window.Webflow.push(() => {
 
   itemTemplate.remove();
 
-  const pokemonItems = pokemonsData.map(({ id, name, sprites }) => {
+  const pokemonItems = [];
+
+  // Auto-generate Pokémon data
+  for (let id = 1; id <= numberOfPokemons; id++) {
+    // Fetch Pokemon details from the API
+    const pokemonDetails = await fetchPokemonData(id);
+
+    // Use the fetched data to create the item
     const item = cloneNode(itemTemplate);
     const imageElement = item.querySelector<HTMLImageElement>('[data-element="pokemon-image"]');
     const idElement = item.querySelector<HTMLDivElement>('[data-element="pokemon-id"]');
     const nameElement = item.querySelector<HTMLDivElement>('[data-element="pokemon-name"]');
 
     if (imageElement) {
-      imageElement.src = sprites.other.official_artwork.front_default;
+      // Use the front_default sprite URL
+      imageElement.src = pokemonDetails.sprites.front_default;
     }
 
     if (idElement) {
-      idElement.textContent = id.toString();
+      idElement.textContent = pokemonDetails.id.toString();
     }
 
     if (nameElement) {
-      nameElement.textContent = name.toString();
+      nameElement.textContent = pokemonDetails.name.toString();
     }
 
     item.removeAttribute('data-cloack');
 
-    return item;
-  });
+    pokemonItems.push(item);
+  }
 
   console.log(pokemonItems);
 
