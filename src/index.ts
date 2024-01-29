@@ -4,7 +4,7 @@ import { cloneNode } from '@finsweet/ts-utils';
 import { greetUser } from '$utils/greet';
 
 const apiUrl = 'https://pokeapi.co/api/v2/pokemon';
-const numberOfPokemons = 99; // Change this to the number of Pokémon you want to fetch
+const numberOfPokemons = 1025; // Change this to the number of Pokémon you want to fetch
 
 // Utility function to convert text to sentence case
 function toSentenceCase(text: string) {
@@ -18,12 +18,28 @@ async function fetchPokemonData(id: number) {
   return data;
 }
 
+// Function to filter Pokémon items based on search input
+function filterPokemonItems(searchText: string, items: HTMLElement[]) {
+  const lowerSearchText = searchText.toLowerCase();
+  items.forEach((item) => {
+    const nameElement = item.querySelector<HTMLDivElement>('[data-element="pokemon-name"]');
+    const typesElement = item.querySelector<HTMLDivElement>('[data-element="pokemon-types"]');
+    if (nameElement && typesElement) {
+      const name = nameElement.textContent?.toLowerCase() || '';
+      const types = typesElement.textContent?.toLowerCase() || '';
+      const isMatch = name.includes(lowerSearchText) || types.includes(lowerSearchText);
+      item.style.display = isMatch ? 'block' : 'none';
+    }
+  });
+}
+
 window.Webflow = window.Webflow || [];
 window.Webflow.push(async () => {
   const itemTemplate = document.querySelector<HTMLAnchorElement>('[data-element="pokemon-item"]');
   if (!itemTemplate) return;
 
   const itemList = itemTemplate.parentElement!;
+  const searchInput = document.querySelector<HTMLInputElement>('[data-element="pokemon-search"]');
 
   itemTemplate.remove();
 
@@ -64,4 +80,12 @@ window.Webflow.push(async () => {
   console.log(pokemonItems);
 
   itemList.append(...pokemonItems);
+
+  // Add event listener to the search input
+  if (searchInput) {
+    searchInput.addEventListener('input', (event) => {
+      const searchText = (event.target as HTMLInputElement).value;
+      filterPokemonItems(searchText, pokemonItems);
+    });
+  }
 });
