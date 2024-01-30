@@ -4,7 +4,7 @@ import { cloneNode } from '@finsweet/ts-utils';
 import { greetUser } from '$utils/greet';
 
 const apiUrl = 'https://pokeapi.co/api/v2/pokemon';
-const numberOfPokemons = 1025; // Change this to the number of Pokémon you want to fetch
+const numberOfPokemons = 30; // Change this to the number of Pokémon you want to fetch
 
 // Utility function to convert text to sentence case
 function toSentenceCase(text: string) {

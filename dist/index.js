@@ -8,7 +8,7 @@
 
   // src/index.ts
   var apiUrl = "https://pokeapi.co/api/v2/pokemon";
-  var numberOfPokemons = 1025;
+  var numberOfPokemons = 30;
   function toSentenceCase(text) {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   }
